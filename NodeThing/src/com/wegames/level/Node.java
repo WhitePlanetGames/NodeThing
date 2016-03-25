@@ -6,7 +6,6 @@ package com.wegames.level;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -38,7 +37,9 @@ public class Node {
 		
 		return Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
 	}
-	
+	/**
+	 * Returns nearby nodes, the range is defined by the integer maxDistance. This should be used for the purpose of trading.
+	 */
 	public static List<Node> getNearbyNodes(Node target) {
 		List<Node> result = new ArrayList<Node>();
 		for (int i = 0; i < nodes.size(); i++) {
@@ -47,8 +48,8 @@ public class Node {
 		
 		result.sort(new Comparator<Node>() {
 			public int compare(Node o1, Node o2) {
-				if(target.getDistance(o1)<target.getDistance(o2)) return 1;
-				else if(target.getDistance(o1)>target.getDistance(o2)) return-1;
+				if(target.getDistance(o1)>target.getDistance(o2)) return 1;
+				else if(target.getDistance(o1)<target.getDistance(o2)) return-1;
 				else return 0;
 			}
 		});

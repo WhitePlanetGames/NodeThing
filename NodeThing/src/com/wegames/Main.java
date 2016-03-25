@@ -6,23 +6,22 @@ package com.wegames;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.Random;
 
 import javax.swing.JFrame;
 
 import com.wegames.graphics.Screen;
-import com.wegames.level.Resource;
+import com.wegames.level.Node;
 
 /**
  * @author Neptune
  *
  */
 public class Main extends Canvas implements Runnable {
-
+	private static final long serialVersionUID = 1L;
+	
 	Thread thread;
 	boolean running = false;
 
@@ -98,7 +97,9 @@ public class Main extends Canvas implements Runnable {
 	}
 
 	private void tick() {
-
+		for (int i = 0; i < Node.nodes.size(); i++) {
+			Node.nodes.get(i).tick();
+		}
 	}
 
 	private void render() {
@@ -107,9 +108,6 @@ public class Main extends Canvas implements Runnable {
 			createBufferStrategy(3);
 			return;
 		}
-
-		screen.drawCircle(100, 100, 100, 0xffffffff);
-		screen.drawLine(100, 100, 500, 500, 0x99999999);
 
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = screen.pixels[i];
