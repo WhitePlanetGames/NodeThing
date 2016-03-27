@@ -10,14 +10,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.wegames.Main;
+import com.wegames.graphics.Screen;
+
 /**
  * @author Neptune
  *
  */
 public class Node {
-	public int x, y;
+	public int x=0, y=0;
 	
-	public static List<Node> nodes = new ArrayList<Node>();
+	Level level;
 	
 	int maxDistance=400;
 	
@@ -29,7 +32,7 @@ public class Node {
 	Map<Integer, Integer> excess = new HashMap<Integer, Integer>();
 	Map<Integer, Integer> productionExcess = new HashMap<Integer, Integer>();
 	
-	List<Node> nearbyNodes=new ArrayList<Node>();
+	List<Node> nearbyNodes;
 	
 	public double getDistance(Node node) {
 		int dx = node.x-x;
@@ -42,8 +45,8 @@ public class Node {
 	 */
 	public static List<Node> getNearbyNodes(Node target) {
 		List<Node> result = new ArrayList<Node>();
-		for (int i = 0; i < nodes.size(); i++) {
-			if(target.getDistance(nodes.get(i))<=target.maxDistance) result.add(nodes.get(i));
+		for (int i = 0; i < Level.nodes.size(); i++) {
+			if(target.getDistance(Level.nodes.get(i))<=target.maxDistance) result.add(Level.nodes.get(i));
 		}
 		
 		result.sort(new Comparator<Node>() {
@@ -57,9 +60,10 @@ public class Node {
 		return result;
 	}
 	
+	private Random random = new Random();
+	private int standardSize = random.nextInt(100)/8;
+	
 	private void generateResources() {
-		Random random = new Random();
-		int standardSize = random.nextInt(100)/8;
 		for (int i = 0; i < Resource.resources.size(); i++) {
 			if(!Resource.resources.get(i).isRaw()) continue;
 			int amount = (int) ((random.nextDouble()/2+1.5)*standardSize*1000*Resource.resources.get(i).rarity);
@@ -69,6 +73,18 @@ public class Node {
 	
 	public void calculateResources() {
 		for (int i = 0; i < Resource.resources.size(); i++) {
+			if(supply.get(i)!=null&&productionHarvesting.get(i)!=null) {
+				supply.put(i, supply.get(i)+productionHarvesting.get(i));
+			}
+			if(supply.get(i)!=null&&productionExcess.get(i)!=null) {
+				supply.put(i, supply.get(i)+productionExcess.get(i));
+			}
+			if(supply.get(i)==null&&productionHarvesting.get(i)!=null) {
+				supply.put(i, productionHarvesting.get(i));
+			}
+			if(supply.get(i)==null&&productionExcess.get(i)!=null) {
+				supply.put(i, productionExcess.get(i));
+			}
 			if(supply.get(i)==null&&demand.get(i)==null) {
 				return;
 			} else if(supply.get(i)==null&&demand.get(i)!=null) {
@@ -82,6 +98,7 @@ public class Node {
 	}
 	int toUpdate=0;
 	public void tick() {
+		nearbyNodes=getNearbyNodes(this);
 		if(toUpdate<1800) {
 			toUpdate++;
 		} else {
@@ -89,8 +106,57 @@ public class Node {
 			calculateResources();
 		}
 	}
+	
+	public void render(Screen screen) {
+		screen.drawCircle(standardSize*10, x, y, 0xffffffff);
+	}
+	
 	public Node() {
-		nodes.add(this);
+		x=random.nextInt(Main.width);
+		y=random.nextInt(Main.height);
+		
+		Level.nodes.add(this);
 		generateResources();
 	}
+	public Node(int x, int y) {
+		this.x=x;
+		this.y=y;
+		
+		Level.nodes.add(this);
+		generateResources();
+	}
+	
+	public static void main(String[] args) {
+	}
+	
+	@SuppressWarnings("unused")
+	private class Factory {
+		Resource type;
+		
+		int production = 1;
+		
+		int totalUpgrades=0;
+		int maxUpgrades=100;
+		
+		public Factory(Resource type) {
+			this.type=type;
+		}
+		/**
+		 * @return true if upgrade exceeds max upgrades.
+		 */
+		public boolean upgrade() {
+			if(totalUpgrades>=maxUpgrades) return true;
+			totalUpgrades++;
+			production+=2;
+			production=(int) (production*1.1);
+			return false;
+		}
+	}
 }
+
+
+
+
+
+
+

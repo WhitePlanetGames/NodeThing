@@ -22,7 +22,7 @@ public class Resource {
 	 */
 	public static Resource WOOD_RAW = new Resource("Wood:20.0");
 	public static Resource IRON_RAW = new Resource("Iron:8.0");
-	public static Resource GOLD_RAW = new Resource("Gold:0.");
+	public static Resource GOLD_RAW = new Resource("Gold:0.2");
 	public static Resource COPPER_RAW = new Resource("Copper:4.0");
 	public static Resource TIN_RAW = new Resource("Tin:4.0");
 
